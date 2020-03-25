@@ -1,0 +1,124 @@
+<head>
+    <style>
+        body {
+            position: relative;
+            margin: 0 0;
+            padding: 0 0;
+            width: 100%;
+            height: 100%;
+        }
+        div {
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        function color (level) {
+            const a = 1 - 1 / (0.1 * level + 1)
+            return 'rgba(0,0,0,' + a + ')'
+        }
+        function create_left (parent, w, h, format, level) {
+            const _ = document.createElement('div')
+            _.style.width = h + format
+            _.style.height = h + format
+            _.style.top = '0'
+            _.style.left = '0'
+            _.style.backgroundColor = color(level)
+            return _
+        }
+        function create_right (parent, w, h, format, level) {
+            const _ = document.createElement('div')
+            _.style.width = w - h + format
+            _.style.height = h + format
+            _.style.top = '0'
+            _.style.left = h + format
+            _.style.backgroundColor = color(level)
+            return _
+        }
+        function create_top (parent, w, h, format, level) {
+            const _ = document.createElement('div')
+            _.style.width = w + format
+            _.style.height = w + format
+            _.style.top = '0'
+            _.style.left = '0'
+            _.style.backgroundColor = color(level)
+            return _
+        }
+        function create_bottom (parent, w, h, format, level) {
+            const _ = document.createElement('div')
+            _.style.width = w + format
+            _.style.height = h - w + format
+            _.style.top = w + format
+            _.style.left = '0'
+            _.style.backgroundColor = color(level)
+            return _
+        }
+        function connect_horisontal (parent, w, h, format, level, create_left, create_right, create_top, create_bottom, connect_horisontal, connect_vertical, until, left, right, deep_binary_split) {
+            parent.appendChild(left)
+            parent.appendChild(right)
+            deep_binary_split(right, w - h, h, format, level + 1, create_left, create_right, create_top, create_bottom, connect_horisontal, connect_vertical, until)
+        }
+        function connect_vertical (parent, w, h, format, level, create_left, create_right, create_top, create_bottom, connect_horisontal, connect_vertical, until, top, bottom, deep_binary_split) {
+            parent.appendChild(top)
+            parent.appendChild(bottom)
+            deep_binary_split(bottom, w, h - w, format, level + 1, create_left, create_right, create_top, create_bottom, connect_horisontal, connect_vertical, until)
+        }
+        function until (parent, w, h, level) {
+            return w < 30 || h < 30 || level > 60
+        }
+        function deep_binary_split (parent, w, h, format, level, create_left, create_right, create_top, create_bottom, connect_horisontal, connect_vertical, until) {
+            if (until(parent, w, h, level)) return parent
+            if (w > h)
+                connect_horisontal(
+                    parent,
+                    w,
+                    h,
+                    format,
+                    level,
+                    create_left,
+                    create_right,
+                    create_top,
+                    create_bottom,
+                    connect_horisontal,
+                    connect_vertical,
+                    until,
+                    create_left(parent, w, h, format, level),
+                    create_right(parent, w, h, format, level),
+                    deep_binary_split
+                )
+            else
+                connect_vertical(
+                    parent,
+                    w,
+                    h,
+                    format,
+                    level,
+                    create_left,
+                    create_right,
+                    create_top,
+                    create_bottom,
+                    connect_horisontal,
+                    connect_vertical,
+                    until,
+                    create_top(parent, w, h, format, level),
+                    create_bottom(parent, w, h, format, level),
+                    deep_binary_split
+                )
+        }
+        deep_binary_split(
+            document.body,
+            window.innerWidth,
+            window.innerHeight,
+            'px',
+            1,
+            create_left,
+            create_right,
+            create_top,
+            create_bottom,
+            connect_horisontal,
+            connect_vertical,
+            until
+        )
+    </script>
+</body>
